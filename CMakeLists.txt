@@ -18,7 +18,16 @@
 # Note: on OS X you should install XCode and the associated command-line tools
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
-PROJECT("Eclipse Paho C" C)
+PROJECT(paho_c C)
+find_package(catkin REQUIRED)
+catkin_package(
+  INCLUDE_DIRS src
+  LIBRARIES paho-mqtt3a paho-mqtt3as paho-mqtt3c paho-mqtt3cs
+)
+include_directories(
+  inc
+)
+
 MESSAGE(STATUS "CMake version: " ${CMAKE_VERSION})
 MESSAGE(STATUS "CMake system name: " ${CMAKE_SYSTEM_NAME})
 
@@ -47,14 +56,15 @@ ELSEIF(${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
 ENDIF()
 
 ## build options
-SET(PAHO_WITH_SSL FALSE CACHE BOOL "Flag that defines whether to build ssl-enabled binaries too. ")
+SET(POSITION_INDEPENDENT_CODE TRUE)
+SET(PAHO_WITH_SSL TRUE CACHE BOOL "Flag that defines whether to build ssl-enabled binaries too. ")
 SET(PAHO_BUILD_SHARED TRUE CACHE BOOL "Build shared library")
 SET(PAHO_BUILD_STATIC FALSE CACHE BOOL "Build static library")
 SET(PAHO_BUILD_DOCUMENTATION FALSE CACHE BOOL "Create and install the HTML based API documentation (requires Doxygen)")
 SET(PAHO_BUILD_SAMPLES FALSE CACHE BOOL "Build sample programs")
 SET(PAHO_BUILD_DEB_PACKAGE FALSE CACHE BOOL "Build debian package")
-SET(PAHO_ENABLE_TESTING TRUE CACHE BOOL "Build tests and run")
-SET(PAHO_ENABLE_CPACK TRUE CACHE BOOL "Enable CPack")
+SET(PAHO_ENABLE_TESTING FALSE CACHE BOOL "Build tests and run")
+SET(PAHO_ENABLE_CPACK FALSE CACHE BOOL "Enable CPack")
 
 IF (NOT PAHO_BUILD_SHARED AND NOT PAHO_BUILD_STATIC)
     MESSAGE(FATAL_ERROR "You must set either PAHO_BUILD_SHARED, PAHO_BUILD_STATIC, or both")
@@ -95,7 +105,7 @@ IF (PAHO_ENABLE_CPACK)
             SET(CPACK_GENERATOR "TGZ")
     ENDIF()
 ELSE()
-       FILE(GLOB samples "src/samples/*.c")
+       FILE(GLOB samples "src/samples/*.c" "src/samples/*.h")
        INSTALL(FILES ${samples} DESTINATION ${CMAKE_INSTALL_DOCDIR})
 ENDIF()
 
@@ -111,3 +121,9 @@ IF(PAHO_ENABLE_TESTING)
 ELSE()
     INCLUDE_DIRECTORIES(src)
 ENDIF()
+
+install(DIRECTORY src/
+   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+   FILES_MATCHING PATTERN "*.h"
+   PATTERN "samples/" EXCLUDE
+)
