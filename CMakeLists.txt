@@ -22,7 +22,7 @@ PROJECT(paho_c C)
 find_package(catkin REQUIRED)
 catkin_package(
   INCLUDE_DIRS src
-  LIBRARIES paho-mqtt3a paho-mqtt3as paho-mqtt3c paho-mqtt3cs
+  LIBRARIES paho-mqtt3as paho-mqtt3cs # paho-mqtt3a paho-mqtt3c
 )
 include_directories(
   inc
